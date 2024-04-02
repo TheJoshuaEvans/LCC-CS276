@@ -35,3 +35,8 @@ The databases can be connected to normally at localhost, since the regular ports
 | Server | `mssql` |
 | Username | `sa` |
 | Password | `aStrong(!)Password` |
+
+# Connecting with SQL Server Management Studio
+To log in to Microsoft SQL Server Management Studio, you will need to directly connect to localhost, instead of using the built-in database discovery wizard. Refer to the following screenshot for an example of how to log in:
+
+![Screenshot of login screen](docs/log-in-to-management-studio.png)
