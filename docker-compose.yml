@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: averysecurepassword
+      MYSQL_DATABASE: main
+    volumes:
+      - mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: always
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: aStrong(!)Password 
+      MSSQL_PID: Developer
+    ports:
+      - 1433:1433
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  mysql:
+    driver: local
