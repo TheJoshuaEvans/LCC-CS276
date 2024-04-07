@@ -7,7 +7,7 @@ Write a SELECT statement that returns these columns from the Products table:
 SELECT 
 	ListPrice,
 	DiscountPercent, 
-	ListPrice * (DiscountPercent / 100) AS DiscountAmount
+	ROUND(ListPrice * (DiscountPercent / 100), 2) AS DiscountAmount
 FROM Products;
 
 /*
