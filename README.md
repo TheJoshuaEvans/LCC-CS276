@@ -5,6 +5,8 @@ Resources related to the Database Systems and Modeling course at Lane Community 
 
 Requires Node / NPM be installed to use npm scripts. If using [NVM](https://github.com/nvm-sh/nvm), you can run `nvm use` to automatically use the correct version
 
+# Spoiler Warning!
+This project also includes completed assignments and course resources in the [coursework](./coursework/) directory. Avoid that directory (or delete it entirely) if you don't want any spoilers for the class!
 
 # Running
 This project uses Docker to host a MySql and a Microsoft SQL server, forwarding at the regular ports. The following commands are supported:
