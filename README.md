@@ -9,7 +9,7 @@ Requires Node / NPM be installed to use npm scripts. If using [NVM](https://gith
 This project also includes completed assignments and course resources in the [coursework](./coursework/) directory. Avoid that directory (or delete it entirely) if you don't want any spoilers for the class!
 
 # Running
-This project uses Docker to host a MySql and a Microsoft SQL server, forwarding at the regular ports. The following commands are supported:
+This project uses Docker to host a Microsoft SQL server, forwarding at the regular ports. The following commands are supported:
 ```sh
 npm run docker:up   # Deploy the docker container
 npm run docker:down # Delete the docker container and all volumes
