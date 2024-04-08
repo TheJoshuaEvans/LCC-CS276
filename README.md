@@ -21,24 +21,14 @@ A webapp is also included - [Adminer](https://www.adminer.org/) - in the docker 
 
 # Connecting
 The databases can be connected to normally at localhost, since the regular ports are forwarded. To connect in Adminer, use the following settings:
-
-## MySQL
-| Input | Value |
-|-------|-------|
-| System | `MySQL` |
-| Server | `mysql` |
-| Username | `root` |
-| Password | `averysecurepassword` |
-
-## Microsoft SQL
 | Input | Value |
 |-------|-------|
 | System | `MS SQL (beta)` |
-| Server | `mssql` |
+| Server | `db` |
 | Username | `sa` |
 | Password | `aStrong(!)Password` |
 
-# Connecting with SQL Server Management Studio
+## Connecting with SQL Server Management Studio
 To log in to Microsoft SQL Server Management Studio, you will need to directly connect to localhost, instead of using the built-in database discovery wizard. Refer to the following screenshot for an example of how to log in:
 
 ![Screenshot of login screen](docs/log-in-to-management-studio.png)

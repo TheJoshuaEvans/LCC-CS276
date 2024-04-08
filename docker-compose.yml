@@ -1,17 +1,6 @@
 version: '3.8'
 services:
-  mysql:
-    image: mysql:8
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: averysecurepassword
-      MYSQL_DATABASE: main
-    volumes:
-      - mysql:/var/lib/mysql
-    ports:
-      - 3306:3306
-
-  mssql:
+  db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     restart: always
     environment:
@@ -26,7 +15,3 @@ services:
     restart: always
     ports:
       - 8080:8080
-
-volumes:
-  mysql:
-    driver: local
