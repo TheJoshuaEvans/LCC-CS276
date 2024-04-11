@@ -37,7 +37,7 @@ FROM Students;
 3. Write a SELECT statement that returns these columns from the Students table:
 	A column that uses the CONVERT function to return the EnrollmentDate column in this format:
 		MM/DD/YYY. In other words, use 2-digit months and days and a 4 digit year and separate each date component with slashes
-	A column that uses the CONVERT function to reutrn the EnrollmentDate column with the date,
+	A column that uses the CONVERT function to return the EnrollmentDate column with the date,
 		and the hours, and minutes on a 12-hour clock with an am/pm indicator
 	A column that uses the CONVERT function to return the EnrollmentDate column with just the time in a 24-hour format, including milliseconds
 	A column that uses the CONVERT function to return just the month and day
