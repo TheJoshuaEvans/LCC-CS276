@@ -24,7 +24,6 @@ const isALeapYear = (year) => {
 /**
  * Pads a number with 0s on the left so that it is two digits long
  * @param {number} num
- * @returns
  */
 const padStart2 = (num) => {
   return num.toString().padStart(2, 0)
@@ -33,7 +32,6 @@ const padStart2 = (num) => {
 /**
  * Pads a number with 0s on the left so that it is four digits long
  * @param {number} num
- * @returns
  */
 const padStart4 = (num) => {
   return num.toString().padStart(2, 0)
