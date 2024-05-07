@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Resources related to the Database Systems and Modeling course at Lane Community College",
   "scripts": {
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down && docker volume rm lcc-cs276_mysql"
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down && docker compose down -v"
   },
   "author": "Joshua Evans <thejoshuaevans@gmail.com>",
   "license": "MIT"

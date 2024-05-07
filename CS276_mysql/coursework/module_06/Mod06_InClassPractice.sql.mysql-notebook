@@ -1,0 +1,606 @@
+{
+    "type": "MySQLNotebook",
+    "version": "1.0",
+    "caption": "Script",
+    "content": "USE AP;\n\nDROP TABLE IF EXISTS ShippingLabels;\nCREATE TABLE ShippingLabels(\n    VendorID varchar(50),\n    VendorName varchar(50),\n    VendorAddress1 varchar(50),\n    VendorAddress2 varchar(50),\n    VendorCity varchar(50),\n    VendorState char(2),\n    VendorZipCode varchar(20)\n);\n\nSELECT * FROM ShippingLabels;\n\nDROP TRIGGER IF EXISTS Invoices_UPDATE_Shipping;\n\nDELIMITER //\nCREATE TRIGGER Invoices_UPDATE_Shipping\nAFTER UPDATE\nON Invoices\nFOR EACH ROW\nBEGIN\n    INSERT INTO ShippingLabels(\n        VendorID, VendorName, VendorAddress1, VendorAddress2,\n        VendorCity, VendorState, VendorZipCode\n    )\n    SELECT\n        Vendors.VendorID, Vendors.VendorName, Vendors.VendorAddress1, Vendors.VendorAddress2,\n        Vendors.VendorCity, Vendors.VendorState, Vendors.VendorZipCode\n    FROM Vendors\n    JOIN Invoices ON Vendors.VendorID = NEW.VendorID\n    WHERE \n        NEW.InvoiceTotal - NEW.PaymentTotal - NEW.CreditTotal <= 0 AND\n        NEW.InvoiceID = Invoices.InvoiceID;\nEND;//\nDELIMITER ;\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 8;\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 100;\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 12;\n\nSELECT * FROM ShippingLabels;\n\n-- Check for Uniqueness\nUSE AP;\nDROP TABLE IF EXISTS TestUniqueNulls;\nCREATE TABLE TestUniqueNulls(\n  RowID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  NoDupName VARCHAR(20) NULL\n);\n\nDELIMITER //\nCREATE TRIGGER NoDuplicates\nAFTER INSERT ON TestUniqueNulls\nFOR EACH ROW\nBEGIN\n    DECLARE count_rows INT;\n    SELECT COUNT(*) INTO count_rows\n    FROM TestUniqueNulls\n    WHERE NoDupName <=> NEW.NoDupName;\n\n    IF count_rows > 1 THEN\n        SIGNAL SQLSTATE '45000'\n        SET MESSAGE_TEXT = 'Duplicate value.';\n    END IF;\nEND;//\nDELIMITER ;\n\nINSERT into TestUniqueNulls (NoDupName) VALUES (null);\nINSERT into TestUniqueNulls (NoDupName) VALUES (null);\nINSERT into TestUniqueNulls (NoDupName) VALUES ('Anne Boehm');\nINSERT into TestUniqueNulls (NoDupName) VALUES ('Anne Boehm');\n\nSELECT * FROM TestUniqueNulls;\n\n",
+    "options": {
+        "tabSize": 4,
+        "indentSize": 4,
+        "insertSpaces": true,
+        "defaultEOL": "LF",
+        "trimAutoWhitespace": true
+    },
+    "viewState": null,
+    "contexts": [
+        {
+            "state": {
+                "start": 1,
+                "end": 85,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "24bfbc7f-37f2-4e29-f742-1621f783f9d0",
+                        "c3367d3c-ef4a-43a7-d48b-3931ffd96ff1",
+                        "18d4885f-8de5-4917-ac5a-6ca8f56b68dd",
+                        "bb2ebf41-fe33-40f2-a468-f1712d899627",
+                        "2335c348-b144-4f94-b6ac-6998c8c76b56",
+                        "49c94f8a-b0ec-40c0-b89a-acd7bbe285be",
+                        "872a6bd6-8a0e-4a5f-bd4f-2cf866841073",
+                        "b651e60d-7c94-47ee-8c6d-f8f9aa41ef7e",
+                        "9b94f772-eec9-4de4-872f-cbcce9b50665",
+                        "95ae9fda-5da5-40cc-b3bd-c9defa2cadb1",
+                        "b5a41cbc-a880-4112-a8fb-6b82f89019e1",
+                        "b7c6b608-8adb-4ffc-dd2a-2859f64af2df",
+                        "bc2d0314-303e-4778-bd6d-8e8d4f0b6c56",
+                        "6e485f84-3d8d-4359-9fcf-052d44449e05",
+                        "6a73fd35-9bb4-49d9-a2e1-6807402b33cd",
+                        "0b1809ca-3fc1-4dc7-f145-4b615d045994",
+                        "19d737cd-03ca-421a-cbf5-5067c04da929"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 7
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 7,
+                            "length": 38
+                        },
+                        "contentStart": 10,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 45,
+                            "length": 233
+                        },
+                        "contentStart": 46,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 278,
+                            "length": 31
+                        },
+                        "contentStart": 280,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 309,
+                            "length": 50
+                        },
+                        "contentStart": 312,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": "//",
+                        "span": {
+                            "start": 359,
+                            "length": 14
+                        },
+                        "contentStart": 361,
+                        "state": 4
+                    },
+                    {
+                        "delimiter": "//",
+                        "span": {
+                            "start": 373,
+                            "length": 610
+                        },
+                        "contentStart": 374,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 983,
+                            "length": 12
+                        },
+                        "contentStart": 984,
+                        "state": 4
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 995,
+                            "length": 91
+                        },
+                        "contentStart": 997,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1086,
+                            "length": 93
+                        },
+                        "contentStart": 1088,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1179,
+                            "length": 92
+                        },
+                        "contentStart": 1181,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1271,
+                            "length": 31
+                        },
+                        "contentStart": 1273,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1302,
+                            "length": 33
+                        },
+                        "contentStart": 1328,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1335,
+                            "length": 38
+                        },
+                        "contentStart": 1337,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1373,
+                            "length": 111
+                        },
+                        "contentStart": 1374,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": "//",
+                        "span": {
+                            "start": 1484,
+                            "length": 14
+                        },
+                        "contentStart": 1486,
+                        "state": 4
+                    },
+                    {
+                        "delimiter": "//",
+                        "span": {
+                            "start": 1498,
+                            "length": 333
+                        },
+                        "contentStart": 1499,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1831,
+                            "length": 12
+                        },
+                        "contentStart": 1832,
+                        "state": 4
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1843,
+                            "length": 56
+                        },
+                        "contentStart": 1845,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1899,
+                            "length": 55
+                        },
+                        "contentStart": 1900,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1954,
+                            "length": 63
+                        },
+                        "contentStart": 1955,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 2017,
+                            "length": 63
+                        },
+                        "contentStart": 2018,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 2080,
+                            "length": 32
+                        },
+                        "contentStart": 2082,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 2112,
+                            "length": 2
+                        },
+                        "contentStart": 2111,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "24bfbc7f-37f2-4e29-f742-1621f783f9d0",
+                    "rows": [
+                        {
+                            "0": "89",
+                            "1": "Evans Executone Inc",
+                            "2": "4918 Taylor Ct",
+                            "3": null,
+                            "4": "Turlock",
+                            "5": "CA",
+                            "6": "95380"
+                        },
+                        {
+                            "0": "123",
+                            "1": "Federal Express Corporation",
+                            "2": "P.O. Box 1140",
+                            "3": "Dept A",
+                            "4": "Memphis",
+                            "5": "TN",
+                            "6": "38101"
+                        },
+                        {
+                            "0": "96",
+                            "1": "Wells Far; Bank",
+                            "2": "Business Mastercard",
+                            "3": "P.O. Box 29479",
+                            "4": "Phoenix",
+                            "5": "AZ",
+                            "6": "85038"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "VendorID",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "VendorName",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "VendorAddress1",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "VendorAddress2",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "VendorCity",
+                            "field": "4",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "VendorState",
+                            "field": "5",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "VendorZipCode",
+                            "field": "6",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0.894ms"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 11,
+                    "sql": "\n\nSELECT * FROM ShippingLabels"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "c3367d3c-ef4a-43a7-d48b-3931ffd96ff1",
+                    "rows": [
+                        {
+                            "0": 1,
+                            "1": null
+                        },
+                        {
+                            "0": 3,
+                            "1": "Anne Boehm"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "RowID",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "NoDupName",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 2 records retrieved in 1.022ms"
+                    },
+                    "totalRowCount": 2,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 22,
+                    "sql": "\n\nSELECT * FROM TestUniqueNulls"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "18d4885f-8de5-4917-ac5a-6ca8f56b68dd",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 0.678ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "USE AP"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "bb2ebf41-fe33-40f2-a468-f1712d899627",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 16.299ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 1,
+                    "sql": "\n\nDROP TABLE IF EXISTS ShippingLabels"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "2335c348-b144-4f94-b6ac-6998c8c76b56",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 21.085ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 2,
+                    "sql": "\nCREATE TABLE ShippingLabels(\n    VendorID varchar(50),\n    VendorName varchar(50),\n    VendorAddress1 varchar(50),\n    VendorAddress2 varchar(50),\n    VendorCity varchar(50),\n    VendorState char(2),\n    VendorZipCode varchar(20)\n)"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "49c94f8a-b0ec-40c0-b89a-acd7bbe285be",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 1.422ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 3,
+                    "sql": "\n\nSELECT * FROM ShippingLabels"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "872a6bd6-8a0e-4a5f-bd4f-2cf866841073",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 8.44ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 4,
+                    "sql": "\n\nDROP TRIGGER IF EXISTS Invoices_UPDATE_Shipping"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "b651e60d-7c94-47ee-8c6d-f8f9aa41ef7e",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 9.67ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 6,
+                    "sql": "\nCREATE TRIGGER Invoices_UPDATE_Shipping\nAFTER UPDATE\nON Invoices\nFOR EACH ROW\nBEGIN\n    INSERT INTO ShippingLabels(\n        VendorID, VendorName, VendorAddress1, VendorAddress2,\n        VendorCity, VendorState, VendorZipCode\n    )\n    SELECT\n        Vendors.VendorID, Vendors.VendorName, Vendors.VendorAddress1, Vendors.VendorAddress2,\n        Vendors.VendorCity, Vendors.VendorState, Vendors.VendorZipCode\n    FROM Vendors\n    JOIN Invoices ON Vendors.VendorID = NEW.VendorID\n    WHERE \n        NEW.InvoiceTotal - NEW.PaymentTotal - NEW.CreditTotal <= 0 AND\n        NEW.InvoiceID = Invoices.InvoiceID;\nEND;"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "9b94f772-eec9-4de4-872f-cbcce9b50665",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 4.661ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 8,
+                    "sql": "\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 8"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "95ae9fda-5da5-40cc-b3bd-c9defa2cadb1",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 4.58ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 9,
+                    "sql": "\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 100"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "b5a41cbc-a880-4112-a8fb-6b82f89019e1",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 4.159ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 10,
+                    "sql": "\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 12"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "b7c6b608-8adb-4ffc-dd2a-2859f64af2df",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 0.887ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 12,
+                    "sql": "\n\n-- Check for Uniqueness\nUSE AP"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "bc2d0314-303e-4778-bd6d-8e8d4f0b6c56",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 12.014ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 13,
+                    "sql": "\nDROP TABLE IF EXISTS TestUniqueNulls"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "6e485f84-3d8d-4359-9fcf-052d44449e05",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 26.062ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 14,
+                    "sql": "\nCREATE TABLE TestUniqueNulls(\n  RowID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  NoDupName VARCHAR(20) NULL\n)"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "6a73fd35-9bb4-49d9-a2e1-6807402b33cd",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 7.767ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 16,
+                    "sql": "\nCREATE TRIGGER NoDuplicates\nAFTER INSERT ON TestUniqueNulls\nFOR EACH ROW\nBEGIN\n    DECLARE count_rows INT;\n    SELECT COUNT(*) INTO count_rows\n    FROM TestUniqueNulls\n    WHERE NoDupName <=> NEW.NoDupName;\n\n    IF count_rows > 1 THEN\n        SIGNAL SQLSTATE '45000'\n        SET MESSAGE_TEXT = 'Duplicate value.';\n    END IF;\nEND;"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "0b1809ca-3fc1-4dc7-f145-4b615d045994",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 1 row affected in 4.197ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 18,
+                    "sql": "\n\nINSERT into TestUniqueNulls (NoDupName) VALUES (null)"
+                },
+                {
+                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
+                    "resultId": "19d737cd-03ca-421a-cbf5-5067c04da929",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 1 row affected in 3.879ms",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 20,
+                    "sql": "\nINSERT into TestUniqueNulls (NoDupName) VALUES ('Anne Boehm')"
+                }
+            ]
+        }
+    ]
+}

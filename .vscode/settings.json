@@ -5,5 +5,8 @@
     "Jobtrak",
     "Murach",
     "NEWID"
-  ]
+  ],
+  "files.exclude": {
+    "**/CS276_mysql": true
+  }
 }

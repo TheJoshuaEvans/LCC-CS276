@@ -52,3 +52,30 @@ SELECT DISTINCT CourseDescription, LastName, FirstName
 FROM StudentCoursesMin
 WHERE StudentCoursesMin.CourseUnits = 3
 ORDER BY LastName ASC, FirstName ASC
+
+-- SECTION 6: Create a student course summary
+DROP VIEW IF EXISTS StudentCoursesSummary;
+GO
+CREATE VIEW StudentCoursesSummary AS
+SELECT
+  FirstName, LastName,
+  (
+    SELECT COUNT(*)
+    FROM StudentCoursesMin as InnerStudentCourseMin
+    WHERE
+      OuterStudentCoursesMin.FirstName = InnerStudentCourseMin.FirstName AND
+      OuterStudentCoursesMin.LastName = InnerStudentCourseMin.LastName
+  ) AS CourseCount,
+  (
+    SELECT SUM(InnerStudentCourseMin.CourseUnits)
+    FROM StudentCoursesMin as InnerStudentCourseMin
+    WHERE
+      OuterStudentCoursesMin.FirstName = InnerStudentCourseMin.FirstName AND
+      OuterStudentCoursesMin.LastName = InnerStudentCourseMin.LastName
+  ) AS UnitsTotal
+FROM StudentCoursesMin AS OuterStudentCoursesMin
+GROUP BY LastName, FirstName
+GO
+
+SELECT * FROM StudentCoursesMin;
+SELECT * FROM StudentCoursesSummary;
