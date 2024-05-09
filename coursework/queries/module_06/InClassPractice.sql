@@ -63,8 +63,8 @@ BEGIN
 END;
 GO
 
-INSERT into TestUniqueNulls VALUES (null)
-INSERT into TestUniqueNulls VALUES (null)
+INSERT into TestUniqueNulls VALUES (null);
+INSERT into TestUniqueNulls VALUES (null);
 INSERT into TestUniqueNulls VALUES ('Anne Boehm');
 INSERT into TestUniqueNulls VALUES ('Anne Boehm');
 
