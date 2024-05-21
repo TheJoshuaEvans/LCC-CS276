@@ -5,41 +5,67 @@
     "content": "USE AP;\n\nDROP TABLE IF EXISTS ShippingLabels;\nCREATE TABLE ShippingLabels(\n    VendorID varchar(50),\n    VendorName varchar(50),\n    VendorAddress1 varchar(50),\n    VendorAddress2 varchar(50),\n    VendorCity varchar(50),\n    VendorState char(2),\n    VendorZipCode varchar(20)\n);\n\nSELECT * FROM ShippingLabels;\n\nDROP TRIGGER IF EXISTS Invoices_UPDATE_Shipping;\n\nDELIMITER //\nCREATE TRIGGER Invoices_UPDATE_Shipping\nAFTER UPDATE\nON Invoices\nFOR EACH ROW\nBEGIN\n    INSERT INTO ShippingLabels(\n        VendorID, VendorName, VendorAddress1, VendorAddress2,\n        VendorCity, VendorState, VendorZipCode\n    )\n    SELECT\n        Vendors.VendorID, Vendors.VendorName, Vendors.VendorAddress1, Vendors.VendorAddress2,\n        Vendors.VendorCity, Vendors.VendorState, Vendors.VendorZipCode\n    FROM Vendors\n    JOIN Invoices ON Vendors.VendorID = NEW.VendorID\n    WHERE \n        NEW.InvoiceTotal - NEW.PaymentTotal - NEW.CreditTotal <= 0 AND\n        NEW.InvoiceID = Invoices.InvoiceID;\nEND;//\nDELIMITER ;\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 8;\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 100;\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 12;\n\nSELECT * FROM ShippingLabels;\n\n-- Check for Uniqueness\nUSE AP;\nDROP TABLE IF EXISTS TestUniqueNulls;\nCREATE TABLE TestUniqueNulls(\n  RowID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  NoDupName VARCHAR(20) NULL\n);\n\nDELIMITER //\nCREATE TRIGGER NoDuplicates\nAFTER INSERT ON TestUniqueNulls\nFOR EACH ROW\nBEGIN\n    DECLARE count_rows INT;\n    SELECT COUNT(*) INTO count_rows\n    FROM TestUniqueNulls\n    WHERE NoDupName <=> NEW.NoDupName;\n\n    IF count_rows > 1 THEN\n        SIGNAL SQLSTATE '45000'\n        SET MESSAGE_TEXT = 'Duplicate value.';\n    END IF;\nEND;//\nDELIMITER ;\n\nINSERT into TestUniqueNulls (NoDupName) VALUES (null);\nINSERT into TestUniqueNulls (NoDupName) VALUES (null);\nINSERT into TestUniqueNulls (NoDupName) VALUES ('Anne Boehm');\nINSERT into TestUniqueNulls (NoDupName) VALUES ('Anne Boehm');\n\nSELECT * FROM TestUniqueNulls;\n\n",
     "options": {
         "tabSize": 4,
-        "indentSize": 4,
         "insertSpaces": true,
-        "defaultEOL": "LF",
+        "indentSize": 4,
+        "defaultEOL": "CRLF",
         "trimAutoWhitespace": true
     },
-    "viewState": null,
+    "viewState": {
+        "cursorState": [
+            {
+                "inSelectionMode": false,
+                "selectionStart": {
+                    "lineNumber": 68,
+                    "column": 25
+                },
+                "position": {
+                    "lineNumber": 68,
+                    "column": 25
+                }
+            }
+        ],
+        "viewState": {
+            "scrollLeft": 0,
+            "firstPosition": {
+                "lineNumber": 56,
+                "column": 1
+            },
+            "firstPositionDeltaTop": -4
+        },
+        "contributionsState": {
+            "editor.contrib.folding": {},
+            "editor.contrib.wordHighlighter": false
+        }
+    },
     "contexts": [
         {
             "state": {
                 "start": 1,
-                "end": 85,
+                "end": 84,
                 "language": "mysql",
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "24bfbc7f-37f2-4e29-f742-1621f783f9d0",
-                        "c3367d3c-ef4a-43a7-d48b-3931ffd96ff1",
-                        "18d4885f-8de5-4917-ac5a-6ca8f56b68dd",
-                        "bb2ebf41-fe33-40f2-a468-f1712d899627",
-                        "2335c348-b144-4f94-b6ac-6998c8c76b56",
-                        "49c94f8a-b0ec-40c0-b89a-acd7bbe285be",
-                        "872a6bd6-8a0e-4a5f-bd4f-2cf866841073",
-                        "b651e60d-7c94-47ee-8c6d-f8f9aa41ef7e",
-                        "9b94f772-eec9-4de4-872f-cbcce9b50665",
-                        "95ae9fda-5da5-40cc-b3bd-c9defa2cadb1",
-                        "b5a41cbc-a880-4112-a8fb-6b82f89019e1",
-                        "b7c6b608-8adb-4ffc-dd2a-2859f64af2df",
-                        "bc2d0314-303e-4778-bd6d-8e8d4f0b6c56",
-                        "6e485f84-3d8d-4359-9fcf-052d44449e05",
-                        "6a73fd35-9bb4-49d9-a2e1-6807402b33cd",
-                        "0b1809ca-3fc1-4dc7-f145-4b615d045994",
-                        "19d737cd-03ca-421a-cbf5-5067c04da929"
+                        "da399b82-4b23-49dc-dc7c-82df96a79458",
+                        "1ce826db-af38-4bef-a4d6-6724ad99fd7f",
+                        "ef8e6261-631d-476e-8884-240e6d530ec2",
+                        "e123e3b3-8d1a-419c-98ba-3b6e8c87d0b1",
+                        "587eed09-dd4b-41c3-a611-aeddc433d300",
+                        "d7cad573-4f74-4562-90f6-c5305c151204",
+                        "5a291238-f64c-40fb-8fcc-6c970c009a2e",
+                        "8cacae00-7396-4c28-eb47-51e67e554124",
+                        "c9b19ef1-62de-49cb-c243-b47dec0c26a7",
+                        "9148b571-a907-4b68-f77d-ce86832508ff",
+                        "11038f8c-31e3-4ca9-b004-4076cc069bf6",
+                        "92aba5d9-46ee-434d-c363-345eaba05951",
+                        "09cb5087-5b4b-466b-a9db-1e851cc6dd0e",
+                        "f9cb8675-007b-4d20-eaac-55d96b7aa33c",
+                        "9c5baafa-656f-446a-975e-d56c57e491fa",
+                        "b4fa5366-bbff-45a1-c570-c0c00ef4df76",
+                        "9b5abf5a-18e2-4770-8af9-0dfe582aef38"
                     ]
                 },
-                "currentHeight": 36,
+                "currentHeight": 166.28125,
                 "statements": [
                     {
                         "delimiter": ";",
@@ -252,7 +278,7 @@
                         "delimiter": ";",
                         "span": {
                             "start": 2112,
-                            "length": 2
+                            "length": 1
                         },
                         "contentStart": 2111,
                         "state": 3
@@ -261,8 +287,8 @@
             },
             "data": [
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "24bfbc7f-37f2-4e29-f742-1621f783f9d0",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "da399b82-4b23-49dc-dc7c-82df96a79458",
                     "rows": [
                         {
                             "0": "89",
@@ -344,7 +370,7 @@
                         }
                     ],
                     "executionInfo": {
-                        "text": "OK, 3 records retrieved in 0.894ms"
+                        "text": "OK, 3 records retrieved in 0.799ms"
                     },
                     "totalRowCount": 3,
                     "hasMoreRows": false,
@@ -353,8 +379,8 @@
                     "sql": "\n\nSELECT * FROM ShippingLabels"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "c3367d3c-ef4a-43a7-d48b-3931ffd96ff1",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "1ce826db-af38-4bef-a4d6-6724ad99fd7f",
                     "rows": [
                         {
                             "0": 1,
@@ -382,7 +408,7 @@
                         }
                     ],
                     "executionInfo": {
-                        "text": "OK, 2 records retrieved in 1.022ms"
+                        "text": "OK, 2 records retrieved in 0.957ms"
                     },
                     "totalRowCount": 2,
                     "hasMoreRows": false,
@@ -391,11 +417,11 @@
                     "sql": "\n\nSELECT * FROM TestUniqueNulls"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "18d4885f-8de5-4917-ac5a-6ca8f56b68dd",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "ef8e6261-631d-476e-8884-240e6d530ec2",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 0.678ms",
+                        "text": "OK, 0 records retrieved in 0.927ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -405,11 +431,11 @@
                     "sql": "USE AP"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "bb2ebf41-fe33-40f2-a468-f1712d899627",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "e123e3b3-8d1a-419c-98ba-3b6e8c87d0b1",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 16.299ms",
+                        "text": "OK, 0 records retrieved in 11.111ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -419,11 +445,11 @@
                     "sql": "\n\nDROP TABLE IF EXISTS ShippingLabels"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "2335c348-b144-4f94-b6ac-6998c8c76b56",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "587eed09-dd4b-41c3-a611-aeddc433d300",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 21.085ms",
+                        "text": "OK, 0 records retrieved in 20.97ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -433,11 +459,11 @@
                     "sql": "\nCREATE TABLE ShippingLabels(\n    VendorID varchar(50),\n    VendorName varchar(50),\n    VendorAddress1 varchar(50),\n    VendorAddress2 varchar(50),\n    VendorCity varchar(50),\n    VendorState char(2),\n    VendorZipCode varchar(20)\n)"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "49c94f8a-b0ec-40c0-b89a-acd7bbe285be",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "d7cad573-4f74-4562-90f6-c5305c151204",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 1.422ms",
+                        "text": "OK, 0 records retrieved in 1.42ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -447,11 +473,11 @@
                     "sql": "\n\nSELECT * FROM ShippingLabels"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "872a6bd6-8a0e-4a5f-bd4f-2cf866841073",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "5a291238-f64c-40fb-8fcc-6c970c009a2e",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 8.44ms",
+                        "text": "OK, 0 records retrieved in 11.152ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -461,11 +487,11 @@
                     "sql": "\n\nDROP TRIGGER IF EXISTS Invoices_UPDATE_Shipping"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "b651e60d-7c94-47ee-8c6d-f8f9aa41ef7e",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "8cacae00-7396-4c28-eb47-51e67e554124",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 9.67ms",
+                        "text": "OK, 0 records retrieved in 6.91ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -475,11 +501,11 @@
                     "sql": "\nCREATE TRIGGER Invoices_UPDATE_Shipping\nAFTER UPDATE\nON Invoices\nFOR EACH ROW\nBEGIN\n    INSERT INTO ShippingLabels(\n        VendorID, VendorName, VendorAddress1, VendorAddress2,\n        VendorCity, VendorState, VendorZipCode\n    )\n    SELECT\n        Vendors.VendorID, Vendors.VendorName, Vendors.VendorAddress1, Vendors.VendorAddress2,\n        Vendors.VendorCity, Vendors.VendorState, Vendors.VendorZipCode\n    FROM Vendors\n    JOIN Invoices ON Vendors.VendorID = NEW.VendorID\n    WHERE \n        NEW.InvoiceTotal - NEW.PaymentTotal - NEW.CreditTotal <= 0 AND\n        NEW.InvoiceID = Invoices.InvoiceID;\nEND;"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "9b94f772-eec9-4de4-872f-cbcce9b50665",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "c9b19ef1-62de-49cb-c243-b47dec0c26a7",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 4.661ms",
+                        "text": "OK, 0 records retrieved in 5.645ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -489,11 +515,11 @@
                     "sql": "\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 8"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "95ae9fda-5da5-40cc-b3bd-c9defa2cadb1",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "9148b571-a907-4b68-f77d-ce86832508ff",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 4.58ms",
+                        "text": "OK, 0 records retrieved in 4.017ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -503,11 +529,11 @@
                     "sql": "\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 100"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "b5a41cbc-a880-4112-a8fb-6b82f89019e1",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "11038f8c-31e3-4ca9-b004-4076cc069bf6",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 4.159ms",
+                        "text": "OK, 0 records retrieved in 4.269ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -517,11 +543,11 @@
                     "sql": "\n\nUPDATE Invoices\nSET PaymentTotal = 10000, PaymentDate = '2020-02-23'\nWHERE InvoiceID = 12"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "b7c6b608-8adb-4ffc-dd2a-2859f64af2df",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "92aba5d9-46ee-434d-c363-345eaba05951",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 0.887ms",
+                        "text": "OK, 0 records retrieved in 0.763ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -531,11 +557,11 @@
                     "sql": "\n\n-- Check for Uniqueness\nUSE AP"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "bc2d0314-303e-4778-bd6d-8e8d4f0b6c56",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "09cb5087-5b4b-466b-a9db-1e851cc6dd0e",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 12.014ms",
+                        "text": "OK, 0 records retrieved in 10.466ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -545,11 +571,11 @@
                     "sql": "\nDROP TABLE IF EXISTS TestUniqueNulls"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "6e485f84-3d8d-4359-9fcf-052d44449e05",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "f9cb8675-007b-4d20-eaac-55d96b7aa33c",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 26.062ms",
+                        "text": "OK, 0 records retrieved in 17.869ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -559,11 +585,11 @@
                     "sql": "\nCREATE TABLE TestUniqueNulls(\n  RowID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  NoDupName VARCHAR(20) NULL\n)"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "6a73fd35-9bb4-49d9-a2e1-6807402b33cd",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "9c5baafa-656f-446a-975e-d56c57e491fa",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 0 records retrieved in 7.767ms",
+                        "text": "OK, 0 records retrieved in 6.214ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -573,11 +599,11 @@
                     "sql": "\nCREATE TRIGGER NoDuplicates\nAFTER INSERT ON TestUniqueNulls\nFOR EACH ROW\nBEGIN\n    DECLARE count_rows INT;\n    SELECT COUNT(*) INTO count_rows\n    FROM TestUniqueNulls\n    WHERE NoDupName <=> NEW.NoDupName;\n\n    IF count_rows > 1 THEN\n        SIGNAL SQLSTATE '45000'\n        SET MESSAGE_TEXT = 'Duplicate value.';\n    END IF;\nEND;"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "0b1809ca-3fc1-4dc7-f145-4b615d045994",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "b4fa5366-bbff-45a1-c570-c0c00ef4df76",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 1 row affected in 4.197ms",
+                        "text": "OK, 1 row affected in 3.979ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -587,11 +613,11 @@
                     "sql": "\n\nINSERT into TestUniqueNulls (NoDupName) VALUES (null)"
                 },
                 {
-                    "tabId": "c2549fcb-764b-4e5a-f37b-8be3bd41b478",
-                    "resultId": "19d737cd-03ca-421a-cbf5-5067c04da929",
+                    "tabId": "5674b029-2354-45c3-9b36-e1342636dfc4",
+                    "resultId": "9b5abf5a-18e2-4770-8af9-0dfe582aef38",
                     "rows": [],
                     "executionInfo": {
-                        "text": "OK, 1 row affected in 3.879ms",
+                        "text": "OK, 1 row affected in 3.932ms",
                         "type": 4
                     },
                     "totalRowCount": 0,
@@ -601,6 +627,26 @@
                     "sql": "\nINSERT into TestUniqueNulls (NoDupName) VALUES ('Anne Boehm')"
                 }
             ]
+        },
+        {
+            "state": {
+                "start": 85,
+                "end": 85,
+                "language": "mysql",
+                "currentHeight": 180,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 0
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
         }
     ]
 }
