@@ -1,10 +1,14 @@
 {
   "cSpell.words": [
     "averysecurepassword",
+    "CUST",
+    "FNAME",
     "IDFK",
     "Jobtrak",
+    "LNAME",
     "Murach",
-    "NEWID"
+    "NEWID",
+    "updatecustbalance"
   ],
   "files.exclude": {
     "**/CS276_mysql": true
