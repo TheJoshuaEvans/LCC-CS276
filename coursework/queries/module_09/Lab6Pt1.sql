@@ -106,7 +106,7 @@ CREATE TABLE [Videos](
   -- Unique ID for the video
   VideoId INT IDENTITY(0,1) NOT NULL PRIMARY KEY,
   -- Link to YouTube where the video can be found
-  VideoUrl VARCHAR(255) NOT NULL,
+  VideoUrl VARCHAR(255) NOT NULL UNIQUE,
   -- Name of the video on YouTube
   VideoName VARCHAR(255) NOT NULL,
   -- The video's description on YouTube, without the copied elements
