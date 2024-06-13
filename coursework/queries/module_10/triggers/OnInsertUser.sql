@@ -27,8 +27,6 @@ INSERT INTO [Users] (UserEmail, UserAlias) VALUES ('test@email.com', 'OnInsertUs
 DECLARE @UserUnsubscribeKey CHAR(64) = (
   SELECT UserUnsubscribeKey FROM [Users] WHERE UserEmail = 'test@email.com'
 );
-SELECT * FROM [Users];
-SELECT UserUnsubscribeKey FROM [Users] WHERE UserEmail = 'test@email.com'
 IF @UserUnsubscribeKey IS NULL BEGIN
   DECLARE @NullErrMsg VARCHAR(255) = 'Got null value';
   THROW 1337000, @NullErrMsg, 1;

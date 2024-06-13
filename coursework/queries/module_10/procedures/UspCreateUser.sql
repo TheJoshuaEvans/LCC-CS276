@@ -1,5 +1,8 @@
 USE [RealTimeWW2];
 
+-- REQUIRES
+-- procedures/UspUpdateUserVideoTypes.sql
+
 /*
   Procedure that can be used to create a new user at the same time as their video types, since
   the default behavior will be subscribing to all the video types.
@@ -11,23 +14,21 @@ CREATE PROCEDURE [UspCreateUser]
   @UserAlias VARCHAR(1024),
   @UserVideoTypes VARCHAR(255) = NULL
 AS
-  -- First insert the user
-  INSERT INTO [Users] (UserEmail, UserAlias) VALUES (@UserEmail, @UserAlias);
-  DECLARE @UserId INT = @@IDENTITY;
-  
-  -- Only add user video types if we were given video types to add
-  IF @UserVideoTypes IS NOT NULL BEGIN
-     -- Split the user video types into a table so we can loop through them
-    DECLARE @UserVideoTypesTable TABLE (value INT)
-    INSERT INTO @UserVideoTypesTable SELECT * FROM STRING_SPLIT(@UserVideoTypes, ',');
-
-    WHILE EXISTS (SELECT * FROM @UserVideoTypesTable) BEGIN
-      DECLARE @VideoTypeId INT = (SELECT TOP 1 value FROM @UserVideoTypesTable);
-      INSERT INTO [UserVideoTypes] (UserId, VideoTypeId) VALUES (@UserId, @VideoTypeId);
-
-      DELETE @UserVideoTypesTable WHERE value = @VideoTypeId;
+  BEGIN TRANSACTION
+  BEGIN TRY
+    -- First insert the user
+    INSERT INTO [Users] (UserEmail, UserAlias) VALUES (@UserEmail, @UserAlias);
+    DECLARE @UserId INT = @@IDENTITY;
+    
+    -- Only add user video types if we were given video types to add
+    IF @UserVideoTypes IS NOT NULL BEGIN
+      EXEC [UspUpdateUserVideoTypes] @UserId, @UserVideoTypes;
     END;
-  END;
+  END TRY BEGIN CATCH
+    ROLLBACK TRANSACTION;
+    THROW;
+  END CATCH
+  COMMIT TRANSACTION;
 GO
 
 GO

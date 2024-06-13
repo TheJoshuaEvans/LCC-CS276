@@ -4,13 +4,13 @@
 USE master;
 GO
 
--- These lines can cause problems when performing development since the IDE creates a connection to the database to help with auto-complete
--- DROP DATABASE IF EXISTS RealTimeWW2;
--- CREATE DATABASE RealTimeWW2; 
+-- These lines can cause problems when performing development since the IDE creates a connection
+-- to the database to help with auto-complete
+DROP DATABASE IF EXISTS RealTimeWW2;
+CREATE DATABASE RealTimeWW2; 
 GO
 
 USE [RealTimeWW2];
-
 
 -- Because of the complex relationship between tables, it's best to delete them all up front
 -- then create them together
@@ -227,19 +227,19 @@ GO
 -- ----------------- FUNCTIONS ----------------- --
 /*
   Takes a user email and uses secret in the indicated config set to generate the user's
-  unsubscribe key. This is done by generating the SHA 256 hash of the user's email address, plus
+  login key. This is done by generating the SHA 256 hash of the user's email address, plus
   the secret from the config set as a salt
 */
-DROP FUNCTION IF EXISTS CalculateUserUnsubscribeKey;
+DROP FUNCTION IF EXISTS CalculateUserLoginKey;
 GO
-CREATE FUNCTION CalculateUserUnsubscribeKey(@UserEmail VARCHAR(320), @ConfigSetId INT = 0) 
+CREATE FUNCTION CalculateUserLoginKey(@UserEmail VARCHAR(320), @ConfigSetId INT = 0) 
 RETURNS VARCHAR(64) AS
 BEGIN
-  DECLARE @UnsubscribeLinkSecret VARCHAR(255) = (
-    SELECT UnsubscribeLinkSecret FROM ConfigSets WHERE ConfigSetId = @ConfigSetId
+  DECLARE @LoginLinkSecret VARCHAR(255) = (
+    SELECT UserLoginSecret FROM ConfigSets WHERE ConfigSetId = @ConfigSetId
   );
   DECLARE @Result VARCHAR(64) = CONVERT(
-    VARCHAR(64), HASHBYTES('SHA2_256', @UserEmail + @UnsubscribeLinkSecret), 2
+    VARCHAR(64), HASHBYTES('SHA2_256', @UserEmail + @LoginLinkSecret), 2
   );
   RETURN @Result;
 END;
@@ -291,6 +291,88 @@ GO
 
 -- ----------------- PROCEDURES ----------------- --
 /*
+  Procedure that updates the video types associated with a user. Takes a user ID and a comma
+  delimited list of video type IDs
+*/
+DROP PROCEDURE IF EXISTS [UspUpdateUserVideoTypes];
+GO
+CREATE PROCEDURE [UspUpdateUserVideoTypes]
+  @UserId INT,
+  @UserVideoTypes VARCHAR(255) = NULL
+AS
+  IF @UserVideoTypes = '' BEGIN;
+    THROW 1025001, 'Cannot remove all video types from a user', 1;
+  END;
+
+  -- Split the user video types into a table so we can loop through them
+  DECLARE @UserVideoTypesTable TABLE (value INT)
+  INSERT INTO @UserVideoTypesTable SELECT * FROM STRING_SPLIT(@UserVideoTypes, ',');
+
+  BEGIN TRANSACTION;
+  BEGIN TRY
+    -- Delete all the existing tables before adding the new ones
+    DELETE FROM [UserVideoTypes] WHERE UserId = @UserId;
+
+    WHILE EXISTS (SELECT * FROM @UserVideoTypesTable) BEGIN
+      DECLARE @VideoTypeId INT = (SELECT TOP 1 value FROM @UserVideoTypesTable);
+      INSERT INTO [UserVideoTypes] (UserId, VideoTypeId) VALUES (@UserId, @VideoTypeId);
+
+      DELETE @UserVideoTypesTable WHERE value = @VideoTypeId;
+    END;
+  END TRY BEGIN CATCH
+    ROLLBACK TRANSACTION;
+    THROW;
+  END CATCH
+  COMMIT TRANSACTION;
+GO
+
+/*
+  Procedure that can be used to create a new user at the same time as their video types, since
+  the default behavior will be subscribing to all the video types.
+*/
+DROP PROCEDURE IF EXISTS [UspCreateUser];
+GO
+CREATE PROCEDURE [UspCreateUser]
+  @UserEmail VARCHAR(320),
+  @UserAlias VARCHAR(1024),
+  @UserVideoTypes VARCHAR(255) = NULL
+AS
+  BEGIN TRANSACTION
+  BEGIN TRY
+    -- First insert the user
+    INSERT INTO [Users] (UserEmail, UserAlias) VALUES (@UserEmail, @UserAlias);
+    DECLARE @UserId INT = @@IDENTITY;
+    
+    -- Only add user video types if we were given video types to add
+    IF @UserVideoTypes IS NOT NULL BEGIN
+      EXEC [UspUpdateUserVideoTypes] @UserId, @UserVideoTypes;
+    END;
+  END TRY BEGIN CATCH
+    ROLLBACK TRANSACTION;
+    THROW;
+  END CATCH
+  COMMIT TRANSACTION;
+GO
+
+/*
+  Deletes all resources associated with a user, but not the user itself
+*/
+DROP PROCEDURE IF EXISTS [UspDeleteUserResources];
+GO
+CREATE PROCEDURE [UspDeleteUserResources] @UserId INT = NULL AS
+  BEGIN TRANSACTION
+  BEGIN TRY
+    DELETE FROM [Emails] WHERE UserId = @UserId;
+    DELETE FROM [UserVideoTypes] WHERE UserId = @UserId;
+    DELETE FROM [UserPlaylists] WHERE UserId = @UserId;
+  END TRY BEGIN CATCH
+    ROLLBACK TRANSACTION
+    THROW
+  END CATCH
+  COMMIT TRANSACTION
+GO
+
+/*
   Deletes a user along with any other resources associated with that user
 */
 DROP PROCEDURE IF EXISTS [UspDeleteUser];
@@ -298,9 +380,7 @@ GO
 CREATE PROCEDURE [UspDeleteUser] @UserId INT = NULL AS
   BEGIN TRANSACTION
   BEGIN TRY
-    DELETE FROM [Emails] WHERE UserId = @UserId;
-    DELETE FROM [UserVideoTypes] WHERE UserId = @UserId;
-    DELETE FROM [UserPlaylists] WHERE UserId = @UserId;
+    EXEC [UspDeleteUserResources] @UserId;
     DELETE FROM [Users] WHERE UserId = @UserId;
   END TRY BEGIN CATCH
     ROLLBACK TRANSACTION
@@ -342,6 +422,28 @@ CREATE TRIGGER [OnUpdateUser] ON [Users] INSTEAD OF UPDATE AS
   FROM [Users] JOIN [inserted]
   ON [Users].UserId = [inserted].UserId
 GO
+
+/*
+  Replacement trigger that fires when deleting users. Will cause an error to be thrown if more
+  than one user is being deleted at a time, and will automatically delete any resources
+  associated with the user
+*/
+DROP TRIGGER IF EXISTS [OnDeleteUser];
+GO
+CREATE TRIGGER [OnDeleteUser] ON [Users] INSTEAD OF DELETE AS
+  DECLARE @ToDeleteCount INT = (SELECT COUNT(*) FROM [deleted])
+  IF @ToDeleteCount > 1 BEGIN
+    DECLARE @Msg VARCHAR(255) = 
+      'Cannot delete more than 1 user at a time. Attempting to delete ' + 
+      CAST(@ToDeleteCount AS VARCHAR(20)) + ' users.';
+    THROW 1025000, @Msg, 1;
+  END;
+
+  DECLARE @UserId INT = (SELECT UserId FROM [deleted]);
+  EXEC [UspDeleteUserResources] @UserId;
+  DELETE FROM [Users] WHERE UserId = @UserId;
+GO
+
 
 -- ----------------- INSERTS ----------------- --
 
