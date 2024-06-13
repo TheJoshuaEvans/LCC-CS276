@@ -313,9 +313,9 @@ AS
     -- Delete all the existing tables before adding the new ones
     DELETE FROM [UserVideoTypes] WHERE UserId = @UserId;
 
-    -- In each loop, take the top item from the temporary video types table, add it to the real
-    -- table, then delete the table type we just added from the temporary table. Keep going until
-    -- there are no more items in the temporary table
+    -- In each loop, take the top item from the video types table variable, add it to the real
+    -- table, then delete the table type we just added from the table variable. Keep going until
+    -- there are no more items to process
     WHILE EXISTS (SELECT * FROM @UserVideoTypesTable) BEGIN
       DECLARE @VideoTypeId INT = (SELECT TOP 1 value FROM @UserVideoTypesTable);
       INSERT INTO [UserVideoTypes] (UserId, VideoTypeId) VALUES (@UserId, @VideoTypeId);
